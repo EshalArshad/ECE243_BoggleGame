@@ -31,6 +31,7 @@ void playGame(const char **words, int numWords) {
         // Read the whole word from the user
         scanf("%s", input);
 
+		// Did this instead of interrupts, not sure if it works?
         // Check if the user wants to return to the level selection
         if (strcmp(input, "exit") == 0) {  // OR RESET
             printf("Returning to level selection screen.\n");
@@ -86,9 +87,11 @@ int main() {
         // Check which key is pressed
         int key = checkKeyPressed();
 
-        // Validate user's choice and play the corresponding level
+        // Play the corresponding level
         if (key == 0) {
             printf("You chose Easy level.\n");
+			// This is where we can add code for background image?
+			// Maybe we should have seperate playGame modules for each level?
             playGame(easyWords, sizeof(easyWords) / sizeof(easyWords[0]));
         } else if (key == 1) {
             printf("You chose Medium level.\n");
