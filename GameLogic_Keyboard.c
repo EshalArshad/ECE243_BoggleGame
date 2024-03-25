@@ -5,6 +5,9 @@
 volatile int* ps2_ptr = (int*) 0xFF200100; // Pointer to PS2
 volatile int* pushButtons = (int *)0xFF200050; // Address for pushbutton keys
 
+// Comment: This code is filled with all the cases I can think of for the game logic
+// Updated: Checks if the word has already been inputted.
+
 // Pre-selected arrays of words for each difficulty level
 const char *easyWords[] = {"A", "B", "C"};
 const char *mediumWords[] = {"word4", "word5", "word6"};
@@ -16,7 +19,6 @@ void clearEdgeCapture();
 int waitForKeyPressAndRelease();
 void playGame(const char **words, int numWords);
 void handleKeyboardInput(char *word);
-bool isValidWord(const char *word, const char **words, int numWords);
 
 // Main
 int main() {
@@ -29,12 +31,15 @@ int main() {
         if (key == 0) {
             printf("You chose Easy level.\n");
             playGame(easyWords, sizeof(easyWords) / sizeof(easyWords[0]));
+			main();
         } else if (key == 1) {
             printf("You chose Medium level.\n");
             playGame(mediumWords, sizeof(mediumWords) / sizeof(mediumWords[0]));
+			main();
         } else if (key == 2) {
             printf("You chose Hard level.\n");
             playGame(hardWords, sizeof(hardWords) / sizeof(hardWords[0]));
+			main();
         }
     }
     return 0;
@@ -77,11 +82,16 @@ int waitForKeyPressAndRelease() {
 // Function to play the game for a given difficulty level
 void playGame(const char **words, int numWords) {
     char input[50]; // Assuming maximum word length is 50 characters
+    bool enteredWords[numWords]; // Track which words have been entered
+    int enteredCount = 0; // Count of how many unique words have been entered
+
+    // Initialize all words as not entered
+    for(int i = 0; i < numWords; i++) {
+        enteredWords[i] = false;
+    }
 
     while (true) {
         printf("Enter a word (Press Enter to finish): ");
-
-        // Use PS2 keyboard input instead of scanf
         handleKeyboardInput(input);
 
         if (strcmp(input, "exit") == 0) {
@@ -89,10 +99,33 @@ void playGame(const char **words, int numWords) {
             break;
         }
 
-        if (isValidWord(input, words, numWords)) {
-            printf("Congratulations! '%s' is a valid word.\n", input);
-        } else {
-            printf("Error: '%s' is not a valid word.\n", input);
+        bool wordFound = false;
+        bool wordAlreadyEntered = false;
+        for (int i = 0; i < numWords; i++) {
+            if (strcmp(words[i], input) == 0) {
+                wordFound = true;
+                if (!enteredWords[i]) {
+                    printf("Congratulations! '%s' is a valid word.\n", input);
+                    enteredWords[i] = true; // Mark this word as entered
+                    enteredCount++; // Increment the count of entered words
+                } else {
+                    wordAlreadyEntered = true; // The word was found but has already been entered
+                }
+                break; // Exit loop once word is found
+            }
+        }
+
+        // Inform user based on word status
+        if (!wordFound) {
+            printf("Error: '%s' is not in the word list.\n", input);
+        } else if (wordAlreadyEntered) {
+            printf("'%s' has already been entered.\n", input);
+        }
+
+        // Check if all words have been entered
+        if (enteredCount == numWords) {
+            printf("All words have been entered! Returning to level selection screen.\n");
+            break; // Exit the while loop to return to level selection
         }
     }
 }
@@ -152,12 +185,4 @@ void handleKeyboardInput(char *word) {
     }
 
     word[wordIndex] = '\0'; // End of String
-}
-
-// Function to check if the word is from the pre-selected arrays
-bool isValidWord(const char *word, const char **words, int numWords) {
-    for (int i = 0; i < numWords; i++) {
-        if (strcmp(words[i], word) == 0) return true;
-    }
-    return false;
 }
