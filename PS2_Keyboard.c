@@ -10,15 +10,16 @@ void handleKeyboardInput(char *word) {
     int wordIndex = 0;
     bool keyReleased = false; // Track if the last key was released
 
-    while (!enterPressed) {
-        keyData = *ps2_ptr;
-        if (keyData != 0) { // Check if data is available
+    while (!enterPressed) { // While "ENTER" has not been pressed
+        keyData = *ps2_ptr; // keyData contains the scan code of the key address
+        if (keyData != 0) { // Check if the key has data, meaning it has been pressed/
             int key = keyData & 0xFF; // Extract the lower 8 bits
             
             if (key == 0xF0) { // Key release code
+				// If the scan code is 0xF0, it signifies that the next key event will be a key release
                 keyReleased = true;
                 // Ensure the next read is ignored by advancing past the release code
-                while(*ps2_ptr == 0); // Wait until a new code is available
+            while(*ps2_ptr == 0); // Wait until a new code is available
             } else if (keyReleased) {
                 switch (key) {
                     case 0x1C: word[wordIndex++] = 'A'; printf("Letter A added\n"); break;
@@ -49,12 +50,14 @@ void handleKeyboardInput(char *word) {
                     case 0x1A: word[wordIndex++] = 'Z'; printf("Letter Z added\n"); break;
                     case 0x5A: enterPressed = true; break; // Enter key pressed
                 }
+				// After handling the key press, keyReleased is set to false 
+				//to indicate that any 0xF0 codes should be treated as the start of a new key release.
                 keyReleased = false; // Reset for next key press
             }
         }
     }
 
-    word[wordIndex] = '\0'; // Null-terminate the string
+    word[wordIndex] = '\0'; // End of String
 }
 
 int main() {
