@@ -48,7 +48,6 @@ void handleKeyboardInput(char *word) {
                     case 0x35: word[wordIndex++] = 'Y'; printf("Letter Y added\n"); break;
                     case 0x1A: word[wordIndex++] = 'Z'; printf("Letter Z added\n"); break;
                     case 0x5A: enterPressed = true; break; // Enter key pressed
-                    // Handle other keys similarly...
                 }
                 keyReleased = false; // Reset for next key press
             }
