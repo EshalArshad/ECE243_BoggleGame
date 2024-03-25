@@ -8,7 +8,7 @@ void handleKeyboardInput(char *word) {
     int keyData;
     bool enterPressed = false;
     int wordIndex = 0;
-    bool keyReleased = true; // Track if the last key was released
+    bool keyReleased = false; // Track if the last key was released
 
     while (!enterPressed) {
         keyData = *ps2_ptr;
@@ -16,8 +16,10 @@ void handleKeyboardInput(char *word) {
             int key = keyData & 0xFF; // Extract the lower 8 bits
             
             if (key == 0xF0) { // Key release code
-                keyReleased = true; // Next key data will be a key release
-            } else if (keyReleased) { // Process key press only if the previous key was released
+                keyReleased = true;
+                // Ensure the next read is ignored by advancing past the release code
+                while(*ps2_ptr == 0); // Wait until a new code is available
+            } else if (keyReleased) {
                 switch (key) {
                     case 0x1C: word[wordIndex++] = 'A'; printf("Letter A added\n"); break;
                     case 0x32: word[wordIndex++] = 'B'; printf("Letter B added\n"); break;
@@ -46,7 +48,7 @@ void handleKeyboardInput(char *word) {
                     case 0x35: word[wordIndex++] = 'Y'; printf("Letter Y added\n"); break;
                     case 0x1A: word[wordIndex++] = 'Z'; printf("Letter Z added\n"); break;
                     case 0x5A: enterPressed = true; break; // Enter key pressed
-                    // No default case needed as we only care about the keys above
+                    // Handle other keys similarly...
                 }
                 keyReleased = false; // Reset for next key press
             }
