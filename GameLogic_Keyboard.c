@@ -94,7 +94,7 @@ void playGame(const char **words, int numWords) {
         printf("Enter a word (Press Enter to finish): ");
         handleKeyboardInput(input);
 
-        if (strcmp(input, "exit") == 0) {
+        if (strcmp(input, "EXIT") == 0) {
             printf("Returning to level selection screen.\n");
             break;
         }
