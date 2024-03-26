@@ -31,15 +31,12 @@ int main() {
         if (key == 0) {
             printf("You chose Easy level.\n");
             playGame(easyWords, sizeof(easyWords) / sizeof(easyWords[0]));
-			main();
         } else if (key == 1) {
             printf("You chose Medium level.\n");
             playGame(mediumWords, sizeof(mediumWords) / sizeof(mediumWords[0]));
-			main();
         } else if (key == 2) {
             printf("You chose Hard level.\n");
             playGame(hardWords, sizeof(hardWords) / sizeof(hardWords[0]));
-			main();
         }
     }
     return 0;
